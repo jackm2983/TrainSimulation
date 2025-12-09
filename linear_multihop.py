@@ -450,11 +450,24 @@ def analyze_system_performance(net, results):
     total_slots_available = SIM_TIME / SLOT_DURATION
     total_transmissions = len(trans['distances'])
     channel_util = total_transmissions / total_slots_available if total_slots_available > 0 else 0
+
+    total_air_time = total_transmissions * SLOT_DURATION
+    successful_transmissions = sum(trans['successes'])
+    successful_air_time = successful_transmissions * SLOT_DURATION
+    wasted_air_time = total_air_time - successful_air_time
     
     print(f"\nChannel Utilization:")
     print(f"  Total slots available:  {total_slots_available:.0f}")
     print(f"  Slots with transmission: {total_transmissions}")
     print(f"  Channel utilization:    {channel_util:.4f} ({channel_util*100:.2f}%)")
+
+    print(f"\nAir Time:")
+    print(f"  Total air time:          {total_air_time:.2f} s ({total_air_time/SIM_TIME*100:.2f}% of sim time)")
+    print(f"  Successful air time:     {successful_air_time:.2f} s ({successful_air_time/total_air_time*100:.2f}% of total)")
+    print(f"  Wasted air time:         {wasted_air_time:.2f} s ({wasted_air_time/total_air_time*100:.2f}% of total)")
+    print(f"  Air time per delivery:   {total_air_time/results['delivered']:.4f} s" if results['delivered'] > 0 else "  N/A")
+    print(f"  Air time per originated: {total_air_time/results['originated']:.4f} s" if results['originated'] > 0 else "  N/A")
+   
     
     # Throughput analysis
     throughput = total_transmissions / SIM_TIME if SIM_TIME > 0 else 0
